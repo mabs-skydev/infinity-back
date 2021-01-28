@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
 use App\Models\Post;
 use Illuminate\Http\Request;
 
@@ -14,17 +15,12 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $posts = Post::with(['comments.user', 'user'])->orderBy('created_at', 'desc')->get();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return response()->json([
+            "success" => true,
+            "posts" => $posts,
+        ]);
     }
 
     /**
@@ -35,7 +31,25 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'body' => 'required'
+        ]);
+
+        $post = new Post();
+        $post->body = $request->body;
+
+        if (auth()->user()->posts()->save($post)) {
+            return response()->json([
+                    'success' => true,
+                'post' => $post
+            ]);
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while adding the post.'
+            ], 500);
+        }
     }
 
     /**
@@ -46,7 +60,10 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return response()->json([
+            'success' => true,
+            'post' => $post
+        ], 400);
     }
 
     /**
@@ -81,5 +98,38 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         //
+    }
+
+        /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Post  $post
+     * @return \Illuminate\Http\Response
+     */
+    public function comment(Request $request, $id)
+    {
+        $post = Post::find($id);
+
+        $this->validate($request, [
+            'body' => 'required'
+        ]);
+
+        $comment = new Comment();
+        $comment->body = $request->body;
+        $comment->user_id = auth()->id();
+
+        if ($post->comments()->save($comment)) {
+            return response()->json([
+                    'success' => true,
+                'comment' => $comment
+            ]);
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while adding the comment.'
+            ], 500);
+        }
     }
 }
