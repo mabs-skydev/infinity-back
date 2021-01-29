@@ -11,6 +11,10 @@ class Post extends Model
 
     protected $fillable = ['body'];
 
+    protected $casts = [
+        "created_at" => "datetime:Y-m-d",
+    ];
+
     public function user() {
         return $this->belongsTo(User::class);
     }
