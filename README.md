@@ -4,7 +4,7 @@
 
 - exécutez la commande: composer install
 - copiez le fichier .env.example et changez le nom en .env
-- Créer une base de données (exemple: infini)
+- Créer une base de données (exemple: infinity)
 - Modifiez le nom du BD, le nom d'utilisateur et le mot de passe dans le fichier ".env"
 - exécutez la commande: php artisan passeport: install (--force: si vous avez déjà migré)
 - exécutez la commande: php artisan migrate
