@@ -19,7 +19,15 @@ Route::post('register', [PassportAuthController::class, 'register']);
 Route::post('login', [PassportAuthController::class, 'login']);
 
 Route::middleware('auth:api')->group( function () {
+    Route::get('user', function() {
+        return response()->json([
+            "success" => true,
+            "user" => auth()->user()
+        ]);
+    });
+
     Route::get('posts', [PostController::class, 'index']);
     Route::post('posts', [PostController::class, 'store']);
     Route::post('posts/{id}/comment', [PostController::class, 'comment']);
+    Route::delete('posts/{post}', [PostController::class, 'destroy']);
 });

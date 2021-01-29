@@ -40,8 +40,8 @@ class PostController extends Controller
 
         if (auth()->user()->posts()->save($post)) {
             return response()->json([
-                    'success' => true,
-                'post' => $post
+                'success' => true,
+                'post' => $post->load('user')
             ]);
         }
         else {
@@ -97,7 +97,17 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+
+        if (auth()->user()->cannot('delete', $post)) {
+            abort(403);
+        }
+
+        $post->delete();
+
+        return response()->json([
+            'success' => true,
+            'comment' => $post
+        ]); 
     }
 
         /**
@@ -121,8 +131,8 @@ class PostController extends Controller
 
         if ($post->comments()->save($comment)) {
             return response()->json([
-                    'success' => true,
-                'comment' => $comment
+                'success' => true,
+                'comment' => $comment->load('user')
             ]);
         }
         else {
